@@ -80,6 +80,8 @@ func main() {
 		prevProject = prj*/
 	}
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
+	auswertungExcel.FirstSheet().FreezeHeader()
+	fmt.Println()
 	fmt.Println("saving file...")
 	auswertungExcel.Save(auswertung)
 }
