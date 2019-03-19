@@ -22,28 +22,6 @@ func jobnrPrefix(jobnr string) string {
 	return jobnr[:4]
 }
 
-func campagne(jobnr string) int {
-	if jobnr == "" {
-		return 0
-	}
-	value, err := strconv.Atoi(jobnr[5:8])
-	if err != nil {
-		fmt.Println(err)
-	}
-	return value
-}
-
-func job(jobnr string) int {
-	if jobnr == "" {
-		return 0
-	}
-	value, err := strconv.Atoi(jobnr[9:])
-	if err != nil {
-		fmt.Println(err)
-	}
-	return value
-}
-
 func sum(ofSlice []float32) float32 {
 	var sum float32
 	for _, f := range ofSlice {
