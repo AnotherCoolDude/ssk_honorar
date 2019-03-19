@@ -10,6 +10,7 @@ func (shs *sheetSummary) Columns() []string {
 }
 
 func (shs *sheetSummary) Insert(sh *excel.Sheet) {
+
 	topBorderEuroStyle := excel.Style{Border: excel.Top, Format: excel.Euro}
 	topBorderNoStyle := excel.Style{Border: excel.Top, Format: excel.NoFormat}
 
@@ -25,6 +26,11 @@ func (shs *sheetSummary) Insert(sh *excel.Sheet) {
 		paginiernr.int():              excel.Cell{Value: " ", Style: topBorderNoStyle},
 		honorar.int():                 excel.Cell{Value: ctx.sheetSummary.formula(honorar).Add(), Style: topBorderEuroStyle},
 	}
+	if len(sh.HeaderColumns()) > len(headerTitle()) {
+		shsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.sheetSummary.formula(subsidiesEL).Add(), Style: topBorderEuroStyle}
+		shsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.sheetSummary.formula(subsidiesFK).Add(), Style: topBorderEuroStyle}
+	}
+
 	sh.AddEmptyRow()
 	sh.AddRow(shsCells)
 	ctx.sheetSummary = cellMap{}

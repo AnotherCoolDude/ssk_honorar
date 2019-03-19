@@ -15,6 +15,8 @@ const (
 	fibu
 	paginiernr
 	honorar
+	subsidiesEL
+	subsidiesFK
 )
 
 type header int
@@ -22,6 +24,12 @@ type header int
 func headerTitle() []string {
 	return []string{
 		"Kunde", "Jobnr", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Leistungsart", "FiBu", "Paginiernr.", "Honorar (DB1)",
+	}
+}
+
+func headerTitleSubsidies() []string {
+	return []string{
+		"Kunde", "Jobnr", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Leistungsart", "FiBu", "Paginiernr.", "Honorar (DB1)", "Abgrenzung EL", "Abgrenzung FK",
 	}
 }
 
@@ -51,6 +59,10 @@ func (hdr header) string() string {
 		return "Paginiernr."
 	case honorar:
 		return "Honorar (DB1)"
+	case subsidiesEL:
+		return "Abgrenzung EL"
+	case subsidiesFK:
+		return "Abgrenzung FK"
 	default:
 		fmt.Print("Unknown header")
 		return " "

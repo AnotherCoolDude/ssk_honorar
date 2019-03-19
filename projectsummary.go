@@ -16,6 +16,8 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 	honorarFormula := excel.Formula{Coords: []excel.Coordinates{
 		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int()},
 		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesFK.int()},
 	}}
 
 	topBorderEuroStyle := excel.Style{Border: excel.Top, Format: excel.Euro}
@@ -33,6 +35,15 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		fibu.int():       excel.Cell{Value: " ", Style: topBorderEuroStyle},
 		paginiernr.int(): excel.Cell{Value: " ", Style: topBorderEuroStyle},
 	}
+
+	if len(sh.HeaderColumns()) > len(headerTitle()) {
+		pjtsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesEL).Sum(), Style: topBorderEuroStyle}
+		pjtsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesFK).Sum(), Style: topBorderEuroStyle}
+		pjtsCells[honorar.int()] = excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {
+			return fmt.Sprintf("=%s-%s-%s-%s", coords[0].ToString(), coords[1].ToString(), coords[2].ToString(), coords[3].ToString())
+		}), Style: topBorderEuroStyle}
+	}
+
 	sh.AddRow(pjtsCells)
 	ctx.customerSummary.addFromCurrentRow(sh, []header{
 		revenue,
@@ -40,6 +51,8 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		externalCostsChargeable,
 		invoice,
 		honorar,
+		subsidiesEL,
+		subsidiesFK,
 	})
 	sh.AddEmptyRow()
 	ctx.projectSummary = cellMap{}
