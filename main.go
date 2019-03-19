@@ -32,40 +32,32 @@ func main() {
 
 	projects := []project{}
 	for _, rentRow := range rentData {
-		erFiBu := []string{}
-		erPagNr := []string{}
-		erInv := []float32{}
-		erLA := []string{}
-		for _, erRow := range erData {
-			//rentRow[2] = jobnr; erRow[6] = jobnr
-			if rentRow[2] == erRow[2] {
-				erFiBu = append(erFiBu, erRow[1])
-				erPagNr = append(erPagNr, erRow[0])
-				erInv = append(erInv, mustParseFloat(erRow[4]))
-				erLA = append(erLA, erRow[3])
-			}
-		}
-		var inv float32
-		for _, i := range erInv {
-			inv += i
-		}
-		projects = append(projects, project{
+		newPrj := project{
 			customer:                rentRow[0],
 			jobnr:                   rentRow[1],
 			revenue:                 mustParseFloat(rentRow[2]),
 			externalCosts:           mustParseFloat(rentRow[4]),
 			externalCostsChargeable: mustParseFloat(rentRow[3]),
-			invoice:                 erInv,
-			activity:                erLA,
-			fibu:                    erFiBu,
-			paginiernr:              erPagNr,
-			honorar:                 mustParseFloat(rentRow[2]) - inv,
-		})
+			invoice:                 []float32{},
+			activity:                []string{},
+			fibu:                    []string{},
+			paginiernr:              []string{},
+			honorar:                 0.0,
+		}
+		for _, erRow := range erData {
+			if erRow[2] == newPrj.jobnr {
+				newPrj.invoice = append(newPrj.invoice, mustParseFloat(erRow[4]))
+				newPrj.activity = append(newPrj.activity, erRow[3])
+				newPrj.fibu = append(newPrj.fibu, erRow[1])
+				newPrj.paginiernr = append(newPrj.paginiernr, erRow[0])
+			}
+		}
+		projects = append(projects, newPrj)
 	}
 
 	fmt.Printf("writing %d projects to file\n", len(projects))
 	bar := progressbar.New(len(projects))
-	//var prevProject project
+
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		bar.Add(1)
@@ -73,11 +65,6 @@ func main() {
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
 		}
-		/*
-			if jobnrPrefix(prevProject.jobnr) != " " && jobnrPrefix(prj.jobnr) != jobnrPrefix(prevProject.jobnr) {
-				auswertungExcel.FirstSheet().Add(&customerSummary{name: prevProject.customer})
-			}
-		prevProject = prj*/
 	}
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()

@@ -26,7 +26,7 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		invoice.int():                 excel.Cell{Value: ctx.projectSummary.formula(invoice).Sum(), Style: topBorderEuroStyle},
 		honorar.int(): excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {
 			return fmt.Sprintf("=%s-%s", coords[0].ToString(), coords[1].ToString())
-		}), Style: excel.NoStyle()},
+		}), Style: topBorderEuroStyle},
 
 		// set style for cells that are not filled out
 		activity.int():   excel.Cell{Value: " ", Style: topBorderEuroStyle},
