@@ -38,7 +38,7 @@ func main() {
 	rentabilität18Excel := excel.File(rentabilität18, "")
 	projects := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
 
-	auswertungExcel := excel.File(auswertung, "jan feb")
+	auswertungExcel := excel.NewDraftFile(auswertung, "jan feb")
 	fmt.Printf("writing %d projects to file\n", len(projects))
 	bar := progressbar.New(len(projects))
 
