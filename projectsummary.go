@@ -14,10 +14,10 @@ func (pjts *projectSummary) Columns() []string {
 
 func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 	honorarFormula := excel.Formula{Coords: []excel.Coordinates{
-		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int()},
-		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int()},
-		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int()},
-		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesFK.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int() + 1},
+		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int() + 1},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int() + 1},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesFK.int() + 1},
 	}}
 
 	topBorderEuroStyle := excel.Style{Border: excel.Top, Format: excel.Euro}
