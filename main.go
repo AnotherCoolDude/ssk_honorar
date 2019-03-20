@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/AnotherCoolDude/excel"
-	"github.com/schollz/progressbar"
 )
 
 const (
@@ -40,11 +39,9 @@ func main() {
 
 	auswertungExcel := excel.NewDraftFile(auswertung, "jan feb")
 	fmt.Printf("writing %d projects to file\n", len(projects))
-	bar := progressbar.New(len(projects))
 
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
-		bar.Add(1)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
@@ -71,26 +68,26 @@ func parseDataForMonthlyEvaluation(rentFile, erFile *excel.Excel) (rentData, erD
 }
 
 func parseDataForYearlyEvaluation(rentFile, erFile, adj17File, adj19File, abgr17File, abgr19File *excel.Excel) (rentData, erData, adj17Data, adj19Data, abgr17Data, abgr19Data [][]string) {
-	rentData = rentFile.FirstSheet().FilterByColumn([]string{
+	rentData = rentFile.FirstSheet().ExtractColumns([]string{
 		"A", "C", "E", "G", "I", "L", "E",
 	})
 
-	erData = erFile.FirstSheet().FilterByColumn([]string{
+	erData = erFile.FirstSheet().ExtractColumns([]string{
 		"A", "F", "G", "I", "K",
 	})
 
 	konsolidiert := "konsolidiert"
 
-	adj17Data = adj17File.Sheet(konsolidiert).FilterByColumn([]string{
+	adj17Data = adj17File.Sheet(konsolidiert).ExtractColumns([]string{
 		"A", "B", "C",
 	})
-	adj19Data = adj19File.Sheet(konsolidiert).FilterByColumn([]string{
+	adj19Data = adj19File.Sheet(konsolidiert).ExtractColumns([]string{
 		"A", "B", "C",
 	})
-	abgr17Data = abgr17File.Sheet(konsolidiert).FilterByColumn([]string{
+	abgr17Data = abgr17File.Sheet(konsolidiert).ExtractColumns([]string{
 		"A",
 	})
-	abgr19Data = abgr19File.Sheet(konsolidiert).FilterByColumn([]string{
+	abgr19Data = abgr19File.Sheet(konsolidiert).ExtractColumns([]string{
 		"A", "B", "C",
 	})
 	return

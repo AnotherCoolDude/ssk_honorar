@@ -36,7 +36,7 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		paginiernr.int(): excel.Cell{Value: " ", Style: topBorderEuroStyle},
 	}
 
-	if len(sh.HeaderColumns()) > len(headerTitle()) {
+	if _, ok := ctx.projectSummary[subsidiesEL.string()]; ok {
 		pjtsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesEL).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesFK).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[honorar.int()] = excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {

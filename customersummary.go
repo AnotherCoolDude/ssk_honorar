@@ -28,7 +28,7 @@ func (csts *customerSummary) Insert(sh *excel.Sheet) {
 		paginiernr.int():              excel.Cell{Value: " ", Style: topBorderNoStyle},
 		honorar.int():                 excel.Cell{Value: ctx.customerSummary.formula(honorar).Add(), Style: topBorderEuroStyle},
 	}
-	if len(sh.HeaderColumns()) > len(headerTitle()) {
+	if _, ok := ctx.projectSummary[subsidiesEL.string()]; ok {
 		cstsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.customerSummary.formula(subsidiesEL).Add(), Style: topBorderEuroStyle}
 		cstsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.customerSummary.formula(subsidiesFK).Add(), Style: topBorderEuroStyle}
 	}
