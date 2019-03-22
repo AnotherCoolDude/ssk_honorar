@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	customer header = iota
+	customer header = iota + 1
 	jobnr
 	revenue
 	externalCosts

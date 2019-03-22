@@ -14,10 +14,10 @@ func (pjts *projectSummary) Columns() []string {
 
 func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 	honorarFormula := excel.Formula{Coords: []excel.Coordinates{
-		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int() + 1},
-		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int() + 1},
-		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int() + 1},
-		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesFK.int() + 1},
+		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int()},
+		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesFK.int()},
 	}}
 
 	topBorderEuroStyle := excel.Style{Border: excel.Top, Format: excel.Euro}
@@ -36,7 +36,7 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		paginiernr.int(): excel.Cell{Value: " ", Style: topBorderEuroStyle},
 	}
 
-	if _, ok := ctx.projectSummary[subsidiesEL.string()]; ok {
+	if len(sh.HeaderColumns()) > 10 {
 		pjtsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesEL).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesFK).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[honorar.int()] = excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {

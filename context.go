@@ -22,13 +22,13 @@ func newContext() *context {
 
 func (cmap *cellMap) addFromCurrentRow(sh *excel.Sheet, headerList []header) {
 	for _, hdr := range headerList {
-		(*cmap)[hdr.string()] = append((*cmap)[hdr.string()], excel.Coordinates{Row: sh.CurrentRow(), Column: hdr.int() + 1})
+		(*cmap)[hdr.string()] = append((*cmap)[hdr.string()], excel.Coordinates{Row: sh.CurrentRow(), Column: hdr.int()})
 	}
 }
 
 func (cmap *cellMap) addFromRow(row int, headerList []header) {
 	for _, hdr := range headerList {
-		(*cmap)[hdr.string()] = append((*cmap)[hdr.string()], excel.Coordinates{Row: row, Column: hdr.int() + 1})
+		(*cmap)[hdr.string()] = append((*cmap)[hdr.string()], excel.Coordinates{Row: row, Column: hdr.int()})
 	}
 }
 

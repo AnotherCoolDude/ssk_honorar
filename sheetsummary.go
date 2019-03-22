@@ -26,7 +26,7 @@ func (shs *sheetSummary) Insert(sh *excel.Sheet) {
 		paginiernr.int():              excel.Cell{Value: " ", Style: topBorderNoStyle},
 		honorar.int():                 excel.Cell{Value: ctx.sheetSummary.formula(honorar).Add(), Style: topBorderEuroStyle},
 	}
-	if _, ok := ctx.projectSummary[subsidiesEL.string()]; ok {
+	if len(sh.HeaderColumns()) > 10 {
 		shsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.sheetSummary.formula(subsidiesEL).Add(), Style: topBorderEuroStyle}
 		shsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.sheetSummary.formula(subsidiesFK).Add(), Style: topBorderEuroStyle}
 	}

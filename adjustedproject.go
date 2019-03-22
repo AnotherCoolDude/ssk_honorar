@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/AnotherCoolDude/excel"
 )
 
@@ -44,7 +43,6 @@ func (adjpjt *adjustedProject) Insert(sh *excel.Sheet) {
 			paginiernr.int(): excel.Cell{Value: adjpjt.paginiernr[i], Style: excel.NoStyle()},
 		}
 		sh.AddRow(cells)
-		fmt.Println(cells)
 		ctx.projectSummary.addFromCurrentRow(sh, []header{invoice})
 	}
 	// get lenght of the longer subsidies slice

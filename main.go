@@ -37,9 +37,9 @@ func main() {
 	rentabilität18Excel := excel.File(rentabilität18, "")
 	projects := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
 
-	auswertungExcel := excel.NewDraftFile(auswertung, "jan feb")
+	auswertungExcel := excel.File(auswertung, "jan feb")
 	fmt.Printf("writing %d projects to file\n", len(projects))
-
+	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
@@ -57,11 +57,11 @@ func main() {
 }
 
 func parseDataForMonthlyEvaluation(rentFile, erFile *excel.Excel) (rentData, erData [][]string) {
-	rentData = rentFile.FirstSheet().FilterByColumn([]string{
+	rentData = rentFile.FirstSheet().ExtractColumns([]string{
 		"A", "C", "E", "G", "I", "L", "E",
 	})
 
-	erData = erFile.FirstSheet().FilterByColumn([]string{
+	erData = erFile.FirstSheet().ExtractColumns([]string{
 		"A", "F", "G", "I", "K",
 	})
 	return
