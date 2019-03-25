@@ -8,19 +8,19 @@ import (
 
 const (
 	// monthly
-	rentabilität       = "/Users/christianhovenbitzer/Desktop/Honorar/rent_janfeb.xlsx"
-	eingangsrechnungen = "/Users/christianhovenbitzer/Desktop/Honorar/er_novmarch.xlsx"
+	rentabilität       = "/Users/empfang/Desktop/Honorar/rent_janfeb.xlsx"
+	eingangsrechnungen = "/Users/empfang/Desktop/Honorar/er_novmarch.xlsx"
 
 	// final file
-	auswertung = "/Users/christianhovenbitzer/Desktop/Honorar/Auswertung.xlsx"
+	auswertung = "/Users/empfang/Desktop/Honorar/Auswertung.xlsx"
 
 	// adjusted yearly
-	adj17                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted17.xlsx"
-	adj19                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted19.xlsx"
-	abgr17                  = "/Users/christianhovenbitzer/Desktop/Honorar/2018/abgrenzung17.xlsx"
-	abgr19                  = "/Users/christianhovenbitzer/Desktop/Honorar/2018/abgrenzung19.xlsx"
-	eingangsrechnungen17_19 = "/Users/christianhovenbitzer/Desktop/Honorar/2018/er_rechnungsbuch_17-19.xlsx"
-	rentabilität18          = "/Users/christianhovenbitzer/Desktop/Honorar/2018/rentabilität18.xlsx"
+	adj17                   = "/Users/empfang/Desktop/Honorar/2018/adjusted17.xlsx"
+	adj19                   = "/Users/empfang/Desktop/Honorar/2018/adjusted19.xlsx"
+	abgr17                  = "/Users/empfang/Desktop/Honorar/2018/abgrenzung17.xlsx"
+	abgr19                  = "/Users/empfang/Desktop/Honorar/2018/abgrenzung19.xlsx"
+	eingangsrechnungen17_19 = "/Users/empfang/Desktop/Honorar/2018/er_rechnungsbuch_17-19.xlsx"
+	rentabilität18          = "/Users/empfang/Desktop/Honorar/2018/rentabilität18.xlsx"
 )
 
 var ctx *context
@@ -28,38 +28,6 @@ var ctx *context
 func main() {
 	ctx = newContext()
 
-	// rentExcel := excel.File(rentabilität, "")
-	// erExcel := excel.File(eingangsrechnungen, "")
-	// projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
-	// filterProjects(projects, func(prj project) bool {
-	// 	return prj.jobnr[5:6] == "2"
-	// })
-
-	// // adj17Excel := excel.File(adj17, "")
-	// // adj19Excel := excel.File(adj19, "")
-	// // abgr17Excel := excel.File(abgr17, "")
-	// // abgr19Excel := excel.File(abgr19, "")
-	// // eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "")
-	// // rentabilität18Excel := excel.File(rentabilität18, "")
-	// // projects := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
-
-	// auswertungExcel := excel.File(auswertung, "jan feb")
-	// fmt.Printf("writing %d projects to file\n", len(projects))
-	// auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
-	// for i, prj := range projects {
-	// 	auswertungExcel.FirstSheet().Add(&prj)
-	// 	auswertungExcel.FirstSheet().Add(&projectSummary{})
-	// 	if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
-	// 		auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
-	// 	}
-	// }
-	// auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
-
-	// auswertungExcel.FirstSheet().Add(&sheetSummary{})
-	// auswertungExcel.FirstSheet().FreezeHeader()
-	// fmt.Println()
-	// fmt.Println("saving file...")
-	// auswertungExcel.Save(auswertung)
 	writeYearlyEvaluationToFile()
 
 }
@@ -125,7 +93,6 @@ func writeYearlyEvaluationToFile() {
 	auswertungExcel.FirstSheet().FreezeHeader()
 
 	auswertungExcel.Sheet("Adjustments").AddHeaderColumn(adjustmentHeaderTitle())
-	fmt.Println(auswertungExcel.Sheet("Adjustments").HeaderColumns())
 	for _, adj := range adjustments {
 		auswertungExcel.Sheet("Adjustments").Add(&adj)
 	}
