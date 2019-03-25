@@ -19,7 +19,20 @@ const (
 	subsidiesFK
 )
 
+const (
+	job header = iota + 1
+	year
+	amountEL
+	amountFK
+)
+
 type header int
+
+func adjustmentHeaderTitle() []string {
+	return []string{
+		"Jobnummer", "Jahr", "Betrag EL", "Betrag FK",
+	}
+}
 
 func headerTitle() []string {
 	return []string{
@@ -38,6 +51,21 @@ func (hdr header) int() int {
 }
 
 func (hdr header) string() string {
+	if hdr.isAdjustmentHeader() {
+		switch hdr {
+		case job:
+			return "Jobnummer"
+		case year:
+			return "Jahr"
+		case amountEL:
+			return "Betrag EL"
+		case amountFK:
+			return "Betrag Fk"
+		default:
+			return " "
+		}
+	}
+
 	switch hdr {
 	case customer:
 		return "Kunde"
@@ -67,4 +95,11 @@ func (hdr header) string() string {
 		fmt.Print("Unknown header")
 		return " "
 	}
+}
+
+func (hdr header) isAdjustmentHeader() bool {
+	if hdr == job || hdr == year || hdr == amountEL || hdr == amountFK {
+		return true
+	}
+	return false
 }

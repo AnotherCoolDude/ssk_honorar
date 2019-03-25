@@ -7,16 +7,18 @@ import (
 type cellMap map[string][]excel.Coordinates
 
 type context struct {
-	projectSummary  cellMap
-	customerSummary cellMap
-	sheetSummary    cellMap
+	projectSummary    cellMap
+	customerSummary   cellMap
+	sheetSummary      cellMap
+	adjustmentSummary cellMap
 }
 
 func newContext() *context {
 	return &context{
-		projectSummary:  cellMap{},
-		customerSummary: cellMap{},
-		sheetSummary:    cellMap{},
+		projectSummary:    cellMap{},
+		customerSummary:   cellMap{},
+		sheetSummary:      cellMap{},
+		adjustmentSummary: cellMap{},
 	}
 }
 

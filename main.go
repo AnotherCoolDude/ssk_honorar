@@ -10,7 +10,9 @@ const (
 	// monthly
 	rentabilität       = "/Users/christianhovenbitzer/Desktop/Honorar/rent_janfeb.xlsx"
 	eingangsrechnungen = "/Users/christianhovenbitzer/Desktop/Honorar/er_novmarch.xlsx"
-	auswertung         = "/Users/christianhovenbitzer/Desktop/Honorar/pr_janfeb.xlsx"
+
+	// final file
+	auswertung = "/Users/christianhovenbitzer/Desktop/Honorar/Auswertung.xlsx"
 
 	// adjusted yearly
 	adj17                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted17.xlsx"
@@ -26,36 +28,40 @@ var ctx *context
 func main() {
 	ctx = newContext()
 
-	rentExcel := excel.File(rentabilität, "")
-	erExcel := excel.File(eingangsrechnungen, "")
-	projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
-	filtered := filterPRProjects(projects)
+	// rentExcel := excel.File(rentabilität, "")
+	// erExcel := excel.File(eingangsrechnungen, "")
+	// projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
+	// filterProjects(projects, func(prj project) bool {
+	// 	return prj.jobnr[5:6] == "2"
+	// })
 
-	// adj17Excel := excel.File(adj17, "")
-	// adj19Excel := excel.File(adj19, "")
-	// abgr17Excel := excel.File(abgr17, "")
-	// abgr19Excel := excel.File(abgr19, "")
-	// eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "")
-	// rentabilität18Excel := excel.File(rentabilität18, "")
-	// projects := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
+	// // adj17Excel := excel.File(adj17, "")
+	// // adj19Excel := excel.File(adj19, "")
+	// // abgr17Excel := excel.File(abgr17, "")
+	// // abgr19Excel := excel.File(abgr19, "")
+	// // eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "")
+	// // rentabilität18Excel := excel.File(rentabilität18, "")
+	// // projects := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
 
-	auswertungExcel := excel.File(auswertung, "jan feb")
-	fmt.Printf("writing %d projects to file\n", len(filtered))
-	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
-	for i, prj := range filtered {
-		auswertungExcel.FirstSheet().Add(&prj)
-		auswertungExcel.FirstSheet().Add(&projectSummary{})
-		if i < len(filtered)-1 && jobnrPrefix(filtered[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
-			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
-		}
-	}
-	auswertungExcel.FirstSheet().Add(&customerSummary{filtered[len(filtered)-1].customer})
+	// auswertungExcel := excel.File(auswertung, "jan feb")
+	// fmt.Printf("writing %d projects to file\n", len(projects))
+	// auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
+	// for i, prj := range projects {
+	// 	auswertungExcel.FirstSheet().Add(&prj)
+	// 	auswertungExcel.FirstSheet().Add(&projectSummary{})
+	// 	if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
+	// 		auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
+	// 	}
+	// }
+	// auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
 
-	auswertungExcel.FirstSheet().Add(&sheetSummary{})
-	auswertungExcel.FirstSheet().FreezeHeader()
-	fmt.Println()
-	fmt.Println("saving file...")
-	auswertungExcel.Save(auswertung)
+	// auswertungExcel.FirstSheet().Add(&sheetSummary{})
+	// auswertungExcel.FirstSheet().FreezeHeader()
+	// fmt.Println()
+	// fmt.Println("saving file...")
+	// auswertungExcel.Save(auswertung)
+	writeYearlyEvaluationToFile()
+
 }
 
 func parseDataForMonthlyEvaluation(rentFile, erFile *excel.Excel) (rentData, erData [][]string) {
@@ -95,15 +101,83 @@ func parseDataForYearlyEvaluation(rentFile, erFile, adj17File, adj19File, abgr17
 	return
 }
 
-func filterPRProjects(projects []project) []project {
-	filteredProjects := []project{}
-	for _, prj := range projects {
-		if prj.jobnr[5:6] != "2" {
-			continue
+func writeYearlyEvaluationToFile() {
+	adj17Excel := excel.File(adj17, "")
+	adj19Excel := excel.File(adj19, "")
+	abgr17Excel := excel.File(abgr17, "")
+	abgr19Excel := excel.File(abgr19, "")
+	eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "")
+	rentabilität18Excel := excel.File(rentabilität18, "")
+	projects, adjustments := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
+
+	auswertungExcel := excel.File(auswertung, "Auswertung 2018")
+	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
+	for i, prj := range projects {
+		auswertungExcel.FirstSheet().Add(&prj)
+		auswertungExcel.FirstSheet().Add(&projectSummary{})
+		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
+			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
 		}
-		filteredProjects = append(filteredProjects, prj)
 	}
-	return filteredProjects
+	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
+
+	auswertungExcel.FirstSheet().Add(&sheetSummary{})
+	auswertungExcel.FirstSheet().FreezeHeader()
+
+	auswertungExcel.Sheet("Adjustments").AddHeaderColumn(adjustmentHeaderTitle())
+	fmt.Println(auswertungExcel.Sheet("Adjustments").HeaderColumns())
+	for _, adj := range adjustments {
+		auswertungExcel.Sheet("Adjustments").Add(&adj)
+	}
+	auswertungExcel.Sheet("Adjustments").Add(&adjustmentSummary{})
+	auswertungExcel.Sheet("Adjustments").FreezeHeader()
+
+	fmt.Printf("writing %d projects to file\n", len(projects)+len(adjustments))
+	fmt.Println()
+	fmt.Println("saving file...")
+	auswertungExcel.Save(auswertung)
+}
+
+func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
+	rentExcel := excel.File(rentabilität, "")
+	erExcel := excel.File(eingangsrechnungen, "")
+	projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
+
+	if onlyPR {
+		filterProjects(projects, func(prj project) bool {
+			return prj.jobnr[5:6] == "2"
+		})
+	}
+
+	auswertungExcel := excel.File(auswertung, sheetTitle)
+	fmt.Printf("writing %d projects to file\n", len(projects))
+	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
+	for i, prj := range projects {
+		auswertungExcel.FirstSheet().Add(&prj)
+		auswertungExcel.FirstSheet().Add(&projectSummary{})
+		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
+			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
+		}
+	}
+	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
+
+	auswertungExcel.FirstSheet().Add(&sheetSummary{})
+	auswertungExcel.FirstSheet().FreezeHeader()
+	fmt.Println()
+	fmt.Println("saving file...")
+	auswertungExcel.Save(auswertung)
+}
+
+func filterProjects(projects []project, fn func(prj project) bool) {
+	b := projects[:0]
+	for _, prj := range projects {
+		if fn(prj) {
+			b = append(b, prj)
+		}
+	}
+	for i := len(b); i < len(projects); i++ {
+		projects[i] = project{}
+	}
 }
 
 func allocateProjects(rentData, erData [][]string) []project {
@@ -134,8 +208,26 @@ func allocateProjects(rentData, erData [][]string) []project {
 	return projects
 }
 
-func allocateAdjustedProjects(rentData, erData, adj17Data, adj19Data, abgr17Data, abgr19Data [][]string) []adjustedProject {
+func allocateAdjustedProjects(rentData, erData, adj17Data, adj19Data, abgr17Data, abgr19Data [][]string) ([]adjustedProject, []adjustment) {
 	adjProjects := []adjustedProject{}
+
+	adjustments := []adjustment{}
+	for _, row := range adj17Data {
+		adjustments = append(adjustments, adjustment{
+			jobnr:    row[0],
+			year:     "2017",
+			amountEL: mustParseFloat(row[1]),
+			amountFK: mustParseFloat(row[2]),
+		})
+	}
+	for _, row := range adj19Data {
+		adjustments = append(adjustments, adjustment{
+			jobnr:    row[0],
+			year:     "2019",
+			amountEL: mustParseFloat(row[1]),
+			amountFK: mustParseFloat(row[2]),
+		})
+	}
 
 	// add projects from 19
 	for _, abgr19Row := range abgr19Data {
@@ -195,5 +287,5 @@ func allocateAdjustedProjects(rentData, erData, adj17Data, adj19Data, abgr17Data
 		}
 		adjProjects = append(adjProjects, newPrj)
 	}
-	return sortProjects(adjProjects)
+	return sortProjects(adjProjects), adjustments
 }
