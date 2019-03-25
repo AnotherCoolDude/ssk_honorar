@@ -8,19 +8,19 @@ import (
 
 const (
 	// monthly
-	rentabilität       = "/Users/empfang/Desktop/Honorar/rent_janfeb.xlsx"
-	eingangsrechnungen = "/Users/empfang/Desktop/Honorar/er_novmarch.xlsx"
+	rentabilität       = "/Users/christianhovenbitzer/Desktop/Honorar/rent_janfeb.xlsx"
+	eingangsrechnungen = "/Users/christianhovenbitzer/Desktop/Honorar/er_novmarch.xlsx"
 
 	// final file
-	auswertung = "/Users/empfang/Desktop/Honorar/Auswertung.xlsx"
+	auswertung = "/Users/christianhovenbitzer/Desktop/Honorar/Auswertung.xlsx"
 
 	// adjusted yearly
-	adj17                   = "/Users/empfang/Desktop/Honorar/2018/adjusted17.xlsx"
-	adj19                   = "/Users/empfang/Desktop/Honorar/2018/adjusted19.xlsx"
-	abgr17                  = "/Users/empfang/Desktop/Honorar/2018/abgrenzung17.xlsx"
-	abgr19                  = "/Users/empfang/Desktop/Honorar/2018/abgrenzung19.xlsx"
-	eingangsrechnungen17_19 = "/Users/empfang/Desktop/Honorar/2018/er_rechnungsbuch_17-19.xlsx"
-	rentabilität18          = "/Users/empfang/Desktop/Honorar/2018/rentabilität18.xlsx"
+	adj17                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted17.xlsx"
+	adj19                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted19.xlsx"
+	abgr17                  = "/Users/christianhovenbitzer/Desktop/Honorar/2018/abgrenzung17.xlsx"
+	abgr19                  = "/Users/christianhovenbitzer/Desktop/Honorar/2018/abgrenzung19.xlsx"
+	eingangsrechnungen17_19 = "/Users/christianhovenbitzer/Desktop/Honorar/2018/er_rechnungsbuch_17-19.xlsx"
+	rentabilität18          = "/Users/christianhovenbitzer/Desktop/Honorar/2018/rentabilität18.xlsx"
 )
 
 var ctx *context
@@ -123,13 +123,17 @@ func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
+			// TODO: Get this shit working
+			auswertungExcel.Sheet("Zusammenfassung").Add(&monthlySummary{refSheet: auswertungExcel.FirstSheet()})
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
 		}
 	}
+	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlySummary{refSheet: auswertungExcel.FirstSheet()})
 	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
 
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()
+
 	fmt.Println()
 	fmt.Println("saving file...")
 	auswertungExcel.Save(auswertung)

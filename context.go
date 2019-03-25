@@ -35,5 +35,6 @@ func (cmap *cellMap) addFromRow(row int, headerList []header) {
 }
 
 func (cmap *cellMap) formula(hdr header) *excel.Formula {
-	return &excel.Formula{Coords: (*cmap)[hdr.string()]}
+	coords := (*cmap)[hdr.string()]
+	return &excel.Formula{Coords: &coords}
 }

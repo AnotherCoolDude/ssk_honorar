@@ -13,7 +13,7 @@ func (pjts *projectSummary) Columns() []string {
 }
 
 func (pjts *projectSummary) Insert(sh *excel.Sheet) {
-	honorarFormula := excel.Formula{Coords: []excel.Coordinates{
+	honorarFormula := excel.Formula{Coords: &[]excel.Coordinates{
 		excel.Coordinates{Row: sh.NextRow(), Column: revenue.int()},
 		excel.Coordinates{Row: sh.NextRow(), Column: invoice.int()},
 		excel.Coordinates{Row: sh.NextRow(), Column: subsidiesEL.int()},
@@ -27,7 +27,7 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		externalCostsChargeable.int(): excel.Cell{Value: ctx.projectSummary.formula(externalCostsChargeable).Add(), Style: topBorderEuroStyle},
 		invoice.int():                 excel.Cell{Value: ctx.projectSummary.formula(invoice).Sum(), Style: topBorderEuroStyle},
 		honorar.int(): excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {
-			return fmt.Sprintf("=%s-%s", coords[0].ToString(), coords[1].ToString())
+			return fmt.Sprintf("=%s-%s", coords[0].String(), coords[1].String())
 		}), Style: topBorderEuroStyle},
 
 		// set style for cells that are not filled out
@@ -40,7 +40,7 @@ func (pjts *projectSummary) Insert(sh *excel.Sheet) {
 		pjtsCells[subsidiesEL.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesEL).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[subsidiesFK.int()] = excel.Cell{Value: ctx.projectSummary.formula(subsidiesFK).Sum(), Style: topBorderEuroStyle}
 		pjtsCells[honorar.int()] = excel.Cell{Value: honorarFormula.Raw(func(coords []excel.Coordinates) string {
-			return fmt.Sprintf("=%s-%s-%s-%s", coords[0].ToString(), coords[1].ToString(), coords[2].ToString(), coords[3].ToString())
+			return fmt.Sprintf("=%s-%s-%s-%s", coords[0].String(), coords[1].String(), coords[2].String(), coords[3].String())
 		}), Style: topBorderEuroStyle}
 	}
 
