@@ -28,7 +28,7 @@ var ctx *context
 func main() {
 	ctx = newContext()
 
-	writeYearlyEvaluationToFile()
+	writeMonthlyEvaluationToFile("Jan Feb", false)
 
 }
 
@@ -124,12 +124,13 @@ func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
 			// TODO: Get this shit working
-			auswertungExcel.Sheet("Zusammenfassung").Add(&monthlySummary{refSheet: auswertungExcel.FirstSheet()})
+
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
+			auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 		}
 	}
-	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlySummary{refSheet: auswertungExcel.FirstSheet()})
 	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
+	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()

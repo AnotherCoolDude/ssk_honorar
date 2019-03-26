@@ -43,6 +43,7 @@ func (csts *customerSummary) Insert(sh *excel.Sheet) {
 		subsidiesFK,
 	})
 	sh.AddEmptyRow()
+	ctx.monthlyOverview = ctx.customerSummary
 	ctx.customerSummary = cellMap{}
 
 }

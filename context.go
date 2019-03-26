@@ -11,6 +11,7 @@ type context struct {
 	customerSummary   cellMap
 	sheetSummary      cellMap
 	adjustmentSummary cellMap
+	monthlyOverview   cellMap
 }
 
 func newContext() *context {
@@ -19,6 +20,7 @@ func newContext() *context {
 		customerSummary:   cellMap{},
 		sheetSummary:      cellMap{},
 		adjustmentSummary: cellMap{},
+		monthlyOverview:   cellMap{},
 	}
 }
 
