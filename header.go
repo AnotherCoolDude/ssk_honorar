@@ -46,6 +46,12 @@ func headerTitleSubsidies() []string {
 	}
 }
 
+func monthlyOverViewTitle() []string {
+	return []string{
+		"Kunde", "Kürzel", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Honorar (Umsatz - ER)",
+	}
+}
+
 func (hdr header) int() int {
 	return int(hdr)
 }

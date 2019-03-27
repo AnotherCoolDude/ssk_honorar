@@ -40,3 +40,7 @@ func (cmap *cellMap) formula(hdr header) *excel.Formula {
 	coords := (*cmap)[hdr.string()]
 	return &excel.Formula{Coords: &coords}
 }
+
+func (cmap *cellMap) coordinates(hdr header) []excel.Coordinates {
+	return (*cmap)[hdr.string()]
+}

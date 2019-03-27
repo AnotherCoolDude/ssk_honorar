@@ -42,8 +42,15 @@ func (csts *customerSummary) Insert(sh *excel.Sheet) {
 		subsidiesEL,
 		subsidiesFK,
 	})
+	ctx.monthlyOverview.addFromCurrentRow(sh, []header{
+		customer,
+		revenue,
+		externalCosts,
+		externalCostsChargeable,
+		invoice,
+		honorar,
+	})
 	sh.AddEmptyRow()
-	ctx.monthlyOverview = ctx.customerSummary
 	ctx.customerSummary = cellMap{}
 
 }

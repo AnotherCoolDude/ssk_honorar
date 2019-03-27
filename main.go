@@ -119,6 +119,7 @@ func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 	auswertungExcel := excel.File(auswertung, sheetTitle)
 	fmt.Printf("writing %d projects to file\n", len(projects))
 	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
+	auswertungExcel.Sheet("Zusammenfassung").AddHeaderColumn(monthlyOverViewTitle())
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
@@ -134,6 +135,7 @@ func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()
+	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
 
 	fmt.Println()
 	fmt.Println("saving file...")
