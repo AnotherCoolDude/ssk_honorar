@@ -31,6 +31,22 @@ func (ms *monthlyOverview) Insert(sh *excel.Sheet) {
 	ctx.monthlyOverview = cellMap{}
 }
 
+func (ms *monthlyOverview) in(sh *Sheet) {
+	overviewRows := [][]excel.Cell
+	abbr := ""
+	for _, row := range ms.refSheet.Draft() {
+		if row[1].Value != excel.DraftCell {
+			abbr = fmt.Sprintf("%s", row[1].Value)[:4]
+		}
+		if row[0].Value != excel.DraftCell {
+			sh.AddRow(map[int][]excel.Cell{
+				1: row[0].ChangeStyle(excel.NoStyle()),
+				2: excel.Cell{Value: abbr, Style: excel.NoStyle()},
+			})
+		}
+	}
+}
+
 func (ms *monthlyOverview) insert(sh *excel.Sheet) {
 	refDraft := ms.refSheet.Draft()[1:]
 	summaryRows := [][]excel.Cell{}

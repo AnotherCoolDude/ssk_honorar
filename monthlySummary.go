@@ -22,3 +22,5 @@ func (ms *monthlySummary) Insert(sh *excel.Sheet) {
 	}
 	sh.AddRow(cells)
 }
+
+
