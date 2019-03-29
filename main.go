@@ -120,21 +120,21 @@ func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 	fmt.Printf("writing %d projects to file\n", len(projects))
 	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
 	auswertungExcel.Sheet("Zusammenfassung").AddHeaderColumn(monthlyOverViewTitle())
+
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
-			// TODO: Get this shit working
-
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
-			auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
+			// auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 		}
 	}
 	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
-	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
+	// auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()
+	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
 
 	fmt.Println()
