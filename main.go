@@ -12,7 +12,7 @@ const (
 	eingangsrechnungen = "/Users/christianhovenbitzer/Desktop/Honorar/er_novmarch.xlsx"
 
 	// final file
-	auswertung = "/Users/christianhovenbitzer/Desktop/Honorar/Auswertung.xlsx"
+	auswertung = "/Users/christianhovenbitzer/Desktop/Honorar/AuswertungMonth.xlsx"
 
 	// adjusted yearly
 	adj17                   = "/Users/christianhovenbitzer/Desktop/Honorar/2018/adjusted17.xlsx"
@@ -29,7 +29,7 @@ func main() {
 	ctx = newContext()
 
 	writeMonthlyEvaluationToFile("Jan Feb", false)
-
+	//writeYearlyEvaluationToFile()
 }
 
 func parseDataForMonthlyEvaluation(rentFile, erFile *excel.Excel) (rentData, erData [][]string) {
