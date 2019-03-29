@@ -35,8 +35,8 @@ type monthlyOverview struct {
 func (ms *monthlyOverview) Insert(sh *excel.Sheet) {
 	abbr := ""
 	for _, row := range ms.refSheet.Draft()[1:] {
-		fmt.Println(row)
-		if len(row) > 1 && row[1].Value != excel.DraftCell {
+
+		if len(row) > 1 && row[1].HasValue() {
 			abbr = fmt.Sprintf("%s", row[1].Value)[:4]
 		}
 		if row[0].Value != excel.DraftCell {
