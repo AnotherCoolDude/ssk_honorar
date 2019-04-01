@@ -28,7 +28,7 @@ var ctx *context
 func main() {
 	ctx = newContext()
 
-	writeMonthlyEvaluationToFile("Jan Feb", false)
+	writeMonthlyEvaluationToFile("Jan Feb")
 	//writeYearlyEvaluationToFile()
 }
 
@@ -105,43 +105,51 @@ func writeYearlyEvaluationToFile() {
 	auswertungExcel.Save(auswertung)
 }
 
-func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
+func writeMonthlyEvaluationToFile(sheetTitle string) {
 	rentExcel := excel.File(rentabilität, "")
 	erExcel := excel.File(eingangsrechnungen, "")
-	
-	adj17Excel := excel.File(adj17, "")
-	adj19Excel := excel.File(adj19, "")
-	abgr17Excel := excel.File(abgr17, "")
-	abgr19Excel := excel.File(abgr19, "")
-	
-	projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
+	abgr18Excel := excel.File(abgr19, "")
+	adj18Excel := excel.File(adj19, "")
 
-	if onlyPR {
-		filterProjects(projects, func(prj project) bool {
-			return prj.jobnr[5:6] == "2"
-		})
-	}
+	rentData := rentExcel.FirstSheet().ExtractColumns([]string{
+		"A", "C", "E", "G", "I", "L", "E",
+	})
+
+	erData := erExcel.FirstSheet().ExtractColumns([]string{
+		"A", "F", "G", "I", "K",
+	})
+
+	abgr18Data := abgr18Excel.Sheet("konsolidiert").ExtractColumns([]string{
+		"A",
+	})
+
+	adj18Data := adj18Excel.Sheet("konsolidiert18").ExtractColumns([]string{
+		"A", "B", "C",
+	})
+
+	projects := allocateAdjustedProjects19(rentData, erData, abgr18Data, adj18Data)
 
 	auswertungExcel := excel.File(auswertung, sheetTitle)
 	fmt.Printf("writing %d projects to file\n", len(projects))
-	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitle())
+	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
 	auswertungExcel.Sheet("Zusammenfassung").AddHeaderColumn(monthlyOverViewTitle())
+	auswertungExcel.Sheet("Zusammenfassung PR").AddHeaderColumn(monthlyOverViewTitle())
 
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
 		if i < len(projects)-1 && jobnrPrefix(projects[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
 			auswertungExcel.FirstSheet().Add(&customerSummary{name: prj.customer})
-			// auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 		}
 	}
 	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
-	// auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
 
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()
-	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
-	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
+	//auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet(), prOnly: false})
+	//	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
+	//	auswertungExcel.Sheet("Zusammenfassung PR").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet(), prOnly: true})
+	//	auswertungExcel.Sheet("Zusammenfassung PR").FreezeHeader()
 
 	fmt.Println()
 	fmt.Println("saving file...")
@@ -157,6 +165,18 @@ func filterProjects(projects []project, fn func(prj project) bool) {
 	}
 	for i := len(b); i < len(projects); i++ {
 		projects[i] = project{}
+	}
+}
+
+func filterAdjProjects(projects []adjustedProject, fn func(prj adjustedProject) bool) {
+	b := projects[:0]
+	for _, prj := range projects {
+		if fn(prj) {
+			b = append(b, prj)
+		}
+	}
+	for i := len(b); i < len(projects); i++ {
+		projects[i] = adjustedProject{}
 	}
 }
 
@@ -186,6 +206,78 @@ func allocateProjects(rentData, erData [][]string) []project {
 		projects = append(projects, newPrj)
 	}
 	return projects
+}
+
+func allocateAdjustedProjects19(rentData, erData, abgr18Data, adj18Data [][]string) []adjustedProject {
+	abgrProjectnrs := []string{}
+	for _, row := range abgr18Data {
+		abgrProjectnrs = append(abgrProjectnrs, row[0])
+	}
+
+	// cleaned from 18 projects
+	rentWithout18 := [][]string{}
+	for _, rentRow := range rentData {
+		if !contains(abgrProjectnrs, rentRow[2]) {
+			rentWithout18 = append(rentWithout18, rentRow)
+		}
+	}
+	adjustments := []adjustment{}
+	for _, row := range adj18Data {
+		adjustments = append(adjustments, adjustment{
+			jobnr:    row[0],
+			year:     "2018",
+			amountEL: mustParseFloat(row[1]),
+			amountFK: mustParseFloat(row[2]),
+		})
+	}
+
+	adjustedProjects := []adjustedProject{}
+	for _, row := range rentWithout18 {
+		adjustedProjects = append(adjustedProjects, adjustedProject{
+			customer:                row[0],
+			jobnr:                   row[1],
+			revenue:                 mustParseFloat(row[2]),
+			externalCosts:           mustParseFloat(row[4]),
+			externalCostsChargeable: mustParseFloat(row[3]),
+			invoice:                 []float32{},
+			activity:                []string{},
+			fibu:                    []string{},
+			paginiernr:              []string{},
+			honorar:                 0.0,
+			subsidiesYear:           []string{},
+			subsidiesEL:             []float32{},
+			subsidiesFK:             []float32{},
+		})
+	}
+
+	for _, adjPrj := range adjustedProjects {
+		for _, erRow := range erData {
+			if erRow[2] == adjPrj.jobnr {
+				adjPrj.invoice = append(adjPrj.invoice, mustParseFloat(erRow[4]))
+				adjPrj.activity = append(adjPrj.activity, erRow[3])
+				adjPrj.fibu = append(adjPrj.fibu, erRow[1])
+				adjPrj.paginiernr = append(adjPrj.paginiernr, erRow[0])
+			}
+		}
+
+		for _, adj := range adjustments {
+			if adjPrj.jobnr == adj.jobnr {
+				adjPrj.subsidiesEL = append(adjPrj.subsidiesEL, adj.amountEL)
+				adjPrj.subsidiesFK = append(adjPrj.subsidiesFK, adj.amountFK)
+			}
+		}
+	}
+	return adjustedProjects
+
+}
+
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 func allocateAdjustedProjects(rentData, erData, adj17Data, adj19Data, abgr17Data, abgr19Data [][]string) ([]adjustedProject, []adjustment) {

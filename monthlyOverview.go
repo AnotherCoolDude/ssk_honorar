@@ -8,11 +8,16 @@ import (
 
 type monthlyOverview struct {
 	refSheet *excel.Sheet
+	prOnly   bool
 }
 
 func (ms *monthlyOverview) Insert(sh *excel.Sheet) {
 	abbr := ""
 	for _, row := range ms.refSheet.Draft()[1:] {
+
+		if ms.prOnly && fmt.Sprintf("%s", row[1].Value)[5:6] != "2" {
+			continue
+		}
 
 		if len(row) > 1 && row[1].HasValue() {
 			abbr = fmt.Sprintf("%s", row[1].Value)[:4]
