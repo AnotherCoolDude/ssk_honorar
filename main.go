@@ -108,6 +108,12 @@ func writeYearlyEvaluationToFile() {
 func writeMonthlyEvaluationToFile(sheetTitle string, onlyPR bool) {
 	rentExcel := excel.File(rentabilität, "")
 	erExcel := excel.File(eingangsrechnungen, "")
+	
+	adj17Excel := excel.File(adj17, "")
+	adj19Excel := excel.File(adj19, "")
+	abgr17Excel := excel.File(abgr17, "")
+	abgr19Excel := excel.File(abgr19, "")
+	
 	projects := allocateProjects(parseDataForMonthlyEvaluation(rentExcel, erExcel))
 
 	if onlyPR {

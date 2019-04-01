@@ -48,7 +48,7 @@ func headerTitleSubsidies() []string {
 
 func monthlyOverViewTitle() []string {
 	return []string{
-		"Kunde", "Kürzel", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Honorar (Umsatz - ER)",
+		"Kunde", "Kürzel", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Abgrenzung EL", "Abgrenzung FK", "Honorar (Umsatz - ER)",
 	}
 }
 
