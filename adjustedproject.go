@@ -53,7 +53,7 @@ func (adjpjt *adjustedProject) Insert(sh *excel.Sheet) {
 
 	for i := 0; i < lenghtSubsidies; i++ {
 		cells = map[int]excel.Cell{
-			jobnr.int():       excel.Cell{Value: adjpjt.subsidiesYear[i], Style: excel.NoStyle()},
+			13:                excel.Cell{Value: adjpjt.subsidiesYear[i], Style: excel.NoStyle()},
 			subsidiesEL.int(): excel.Cell{Value: adjpjt.subsidiesEL[i], Style: excel.EuroStyle()},
 			subsidiesFK.int(): excel.Cell{Value: adjpjt.subsidiesFK[i], Style: excel.EuroStyle()},
 		}

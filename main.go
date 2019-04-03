@@ -70,15 +70,15 @@ func parseDataForYearlyEvaluation(rentFile, erFile, adj17File, adj19File, abgr17
 }
 
 func writeYearlyEvaluationToFile() {
-	adj17Excel := excel.File(adj17, "")
-	adj19Excel := excel.File(adj19, "")
-	abgr17Excel := excel.File(abgr17, "")
-	abgr19Excel := excel.File(abgr19, "")
-	eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "")
-	rentabilität18Excel := excel.File(rentabilität18, "")
+	adj17Excel := excel.File(adj17, "", false)
+	adj19Excel := excel.File(adj19, "", false)
+	abgr17Excel := excel.File(abgr17, "", false)
+	abgr19Excel := excel.File(abgr19, "", false)
+	eingangsrechnungen17_19Excel := excel.File(eingangsrechnungen17_19, "", false)
+	rentabilität18Excel := excel.File(rentabilität18, "", false)
 	projects, adjustments := allocateAdjustedProjects(parseDataForYearlyEvaluation(rentabilität18Excel, eingangsrechnungen17_19Excel, adj17Excel, adj19Excel, abgr17Excel, abgr19Excel))
 
-	auswertungExcel := excel.File(auswertung, "Auswertung 2018")
+	auswertungExcel := excel.File(auswertung, "Auswertung 2018", true)
 	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
@@ -106,10 +106,10 @@ func writeYearlyEvaluationToFile() {
 }
 
 func writeMonthlyEvaluationToFile(sheetTitle string) {
-	rentExcel := excel.File(rentabilität, "")
-	erExcel := excel.File(eingangsrechnungen, "")
-	abgr18Excel := excel.File(abgr19, "")
-	adj18Excel := excel.File(adj19, "")
+	rentExcel := excel.File(rentabilität, "", false)
+	erExcel := excel.File(eingangsrechnungen, "", false)
+	abgr18Excel := excel.File(abgr19, "", false)
+	adj18Excel := excel.File(adj19, "", false)
 
 	rentData := rentExcel.FirstSheet().ExtractColumns([]string{
 		"A", "C", "E", "G", "I", "L", "E",
@@ -129,12 +129,11 @@ func writeMonthlyEvaluationToFile(sheetTitle string) {
 
 	projects := allocateAdjustedProjects19(rentData, erData, abgr18Data, adj18Data)
 
-	auswertungExcel := excel.File(auswertung, sheetTitle)
+	auswertungExcel := excel.File(auswertung, sheetTitle, true)
 	fmt.Printf("writing %d projects to file\n", len(projects))
-	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
-	auswertungExcel.Sheet("Zusammenfassung").AddHeaderColumn(monthlyOverViewTitle())
-	auswertungExcel.Sheet("Zusammenfassung PR").AddHeaderColumn(monthlyOverViewTitle())
 
+	// gesamt
+	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
 	for i, prj := range projects {
 		auswertungExcel.FirstSheet().Add(&prj)
 		auswertungExcel.FirstSheet().Add(&projectSummary{})
@@ -143,13 +142,32 @@ func writeMonthlyEvaluationToFile(sheetTitle string) {
 		}
 	}
 	auswertungExcel.FirstSheet().Add(&customerSummary{projects[len(projects)-1].customer})
-
 	auswertungExcel.FirstSheet().Add(&sheetSummary{})
 	auswertungExcel.FirstSheet().FreezeHeader()
-	//auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet(), prOnly: false})
-	//	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
-	//	auswertungExcel.Sheet("Zusammenfassung PR").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet(), prOnly: true})
-	//	auswertungExcel.Sheet("Zusammenfassung PR").FreezeHeader()
+
+	auswertungExcel.Sheet("Zusammenfassung").AddHeaderColumn(monthlyOverViewTitle())
+	auswertungExcel.Sheet("Zusammenfassung").Add(&monthlyOverview{refSheet: auswertungExcel.FirstSheet()})
+	auswertungExcel.Sheet("Zusammenfassung").FreezeHeader()
+
+	// PR
+	filtered := filterAdjProjects(projects, func(prj adjustedProject) bool {
+		return prj.jobnr[5:6] == "2"
+	})
+	auswertungExcel.Sheet("Jan Feb PR").AddHeaderColumn(headerTitleSubsidies())
+	for i, prj := range filtered {
+		auswertungExcel.Sheet("Jan Feb PR").Add(&prj)
+		auswertungExcel.Sheet("Jan Feb PR").Add(&projectSummary{})
+		if i < len(filtered)-1 && jobnrPrefix(filtered[i+1].jobnr) != jobnrPrefix(prj.jobnr) {
+			auswertungExcel.Sheet("Jan Feb PR").Add(&customerSummary{name: prj.customer})
+		}
+	}
+	auswertungExcel.Sheet("Jan Feb PR").Add(&customerSummary{filtered[len(filtered)-1].customer})
+	auswertungExcel.Sheet("Jan Feb PR").Add(&sheetSummary{})
+	auswertungExcel.Sheet("Jan Feb PR").FreezeHeader()
+
+	auswertungExcel.Sheet("Zusammenfassung PR").AddHeaderColumn(monthlyOverViewTitle())
+	auswertungExcel.Sheet("Zusammenfassung PR").Add(&monthlyOverview{refSheet: auswertungExcel.Sheet("Jan Feb PR")})
+	auswertungExcel.Sheet("Zusammenfassung PR").FreezeHeader()
 
 	fmt.Println()
 	fmt.Println("saving file...")
@@ -168,16 +186,14 @@ func filterProjects(projects []project, fn func(prj project) bool) {
 	}
 }
 
-func filterAdjProjects(projects []adjustedProject, fn func(prj adjustedProject) bool) {
-	b := projects[:0]
+func filterAdjProjects(projects []adjustedProject, fn func(prj adjustedProject) bool) []adjustedProject {
+	filtered := []adjustedProject{}
 	for _, prj := range projects {
 		if fn(prj) {
-			b = append(b, prj)
+			filtered = append(filtered, prj)
 		}
 	}
-	for i := len(b); i < len(projects); i++ {
-		projects[i] = adjustedProject{}
-	}
+	return filtered
 }
 
 func allocateProjects(rentData, erData [][]string) []project {
@@ -249,21 +265,23 @@ func allocateAdjustedProjects19(rentData, erData, abgr18Data, adj18Data [][]stri
 			subsidiesFK:             []float32{},
 		})
 	}
+	fmt.Println(len(adjustedProjects))
 
-	for _, adjPrj := range adjustedProjects {
+	for i, adjPrj := range adjustedProjects {
 		for _, erRow := range erData {
 			if erRow[2] == adjPrj.jobnr {
-				adjPrj.invoice = append(adjPrj.invoice, mustParseFloat(erRow[4]))
-				adjPrj.activity = append(adjPrj.activity, erRow[3])
-				adjPrj.fibu = append(adjPrj.fibu, erRow[1])
-				adjPrj.paginiernr = append(adjPrj.paginiernr, erRow[0])
+				adjustedProjects[i].invoice = append(adjustedProjects[i].invoice, mustParseFloat(erRow[4]))
+				adjustedProjects[i].activity = append(adjustedProjects[i].activity, erRow[3])
+				adjustedProjects[i].fibu = append(adjustedProjects[i].fibu, erRow[1])
+				adjustedProjects[i].paginiernr = append(adjustedProjects[i].paginiernr, erRow[0])
 			}
 		}
 
 		for _, adj := range adjustments {
 			if adjPrj.jobnr == adj.jobnr {
-				adjPrj.subsidiesEL = append(adjPrj.subsidiesEL, adj.amountEL)
-				adjPrj.subsidiesFK = append(adjPrj.subsidiesFK, adj.amountFK)
+				adjustedProjects[i].subsidiesYear = append(adjustedProjects[i].subsidiesYear, adj.year)
+				adjustedProjects[i].subsidiesEL = append(adjustedProjects[i].subsidiesEL, adj.amountEL)
+				adjustedProjects[i].subsidiesFK = append(adjustedProjects[i].subsidiesFK, adj.amountFK)
 			}
 		}
 	}
