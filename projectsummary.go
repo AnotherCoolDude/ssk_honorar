@@ -1,12 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"github.com/AnotherCoolDude/excel"
 )
 
 func addProjectSummaryToSheet(sheet *excel.Sheet) {
-	sheet.Draft().Cell
+	formulas := formulaFromIDs([]string{"revenue", "externalCosts", "externalCostsChargeable", "invoice"}, sheet)
+	newRow := excel.Row{
+		3: excel.NewCell(formulas[0].Add()),
+		4: excel.NewCell(formulas[1].Add()),
+		5: excel.NewCell(formulas[2].Add()),
+		6: excel.NewCell(formulas[3].Add()),
+	}
+	sheet.AddRow(newRow)
+}
+
+func formulaFromIDs(ids []string, sheet *excel.Sheet) []excel.Formula {
+	formulas := []excel.Formula{}
+	for _, id := range ids {
+		coords := []excel.Coordinates{}
+		for _, cell := range sheet.Draft().CellsWithID(id) {
+			coords = append(coords, cell.Coordinates())
+		}
+		formulas = append(formulas, excel.Formula{Coords: &coords})
+	}
+	return formulas
 }
 
 // type projectSummary struct {
