@@ -11,8 +11,13 @@ func writeProjectsOfMonthlyEvaluationToFile(projects []adjustedProject) {
 
 	// gesamt
 	auswertungExcel.FirstSheet().AddHeaderColumn(headerTitleSubsidies())
+	currentCustomer := ""
 	for _, adj := range projects {
+		if adj.customer != auswertungExcel.FirstSheet().LastRowAdded()[1].ID() && currentCustomer != "" {
+			addProjectSummaryToSheet(auswertungExcel.FirstSheet())
+		}
 		adj.addRowToSheet(auswertungExcel.FirstSheet())
+		currentCustomer = adj.customer
 	}
 	// for i, prj := range projects {
 	// 	auswertungExcel.FirstSheet().Add(&prj)

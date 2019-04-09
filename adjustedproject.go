@@ -33,9 +33,9 @@ func (adj *adjustedProject) addRowToSheet(sheet *excel.Sheet) {
 	for i := range adj.invoice {
 		newRow = excel.Row{
 			6: excel.NewEuroCell(adj.invoice[i]).SetID("invoice"),
-			7: excel.NewCell(adj.activity[i]).SetID("invoice"),
-			8: excel.NewCell(adj.fibu[i]).SetID("invoice"),
-			9: excel.NewCell(adj.paginiernr[i]).SetID("invoice"),
+			7: excel.NewCell(adj.activity[i]),
+			8: excel.NewCell(adj.fibu[i]),
+			9: excel.NewCell(adj.paginiernr[i]),
 		}
 		sheet.AddRow(newRow)
 	}

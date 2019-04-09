@@ -5,14 +5,21 @@ import (
 )
 
 func addProjectSummaryToSheet(sheet *excel.Sheet) {
-	formulas := formulaFromIDs([]string{"revenue", "externalCosts", "externalCostsChargeable", "invoice"}, sheet)
+	customer := sheet.LastRowAdded()[1].ID()
+	formulas := formulaFromIDs([]string{"revenue", "externalCosts", "externalCostsChargeable", "invoice", "subsidiesEL", "subsidiesFK"}, sheet)
 	newRow := excel.Row{
-		3: excel.NewCell(formulas[0].Add()),
-		4: excel.NewCell(formulas[1].Add()),
-		5: excel.NewCell(formulas[2].Add()),
-		6: excel.NewCell(formulas[3].Add()),
+		1:  excel.NewCell(customer),
+		3:  excel.NewCell(formulas[0].Add()),
+		4:  excel.NewCell(formulas[1].Add()),
+		5:  excel.NewCell(formulas[2].Add()),
+		6:  excel.NewCell(formulas[3].Sum()),
+		10: excel.NewCell(formulas[4].Sum()),
+		11: excel.NewCell(formulas[5].Sum()),
+		12: excel.NewCell(honorarString(sheet, []int{3, 6, 10, 11})),
 	}
+	newRow.AddStyle(excel.Style{Border: excel.Top, Format: excel.Euro})
 	sheet.AddRow(newRow)
+	sheet.AddEmptyRow()
 }
 
 func formulaFromIDs(ids []string, sheet *excel.Sheet) []excel.Formula {
@@ -25,6 +32,16 @@ func formulaFromIDs(ids []string, sheet *excel.Sheet) []excel.Formula {
 		formulas = append(formulas, excel.Formula{Coords: &coords})
 	}
 	return formulas
+}
+
+func honorarString(sheet *excel.Sheet, columns []int) string {
+	coords := []excel.Coordinates{}
+	for _, c := range columns {
+		coords = append(coords, excel.Coordinates{Row: sheet.NextRow(), Column: c})
+	}
+	honorarFormula := excel.Formula{Coords: &coords}
+	formulaString := honorarFormula.Substract(func(coords []excel.Coordinates) excel.Coordinates { return coords[0] })
+	return formulaString
 }
 
 // type projectSummary struct {

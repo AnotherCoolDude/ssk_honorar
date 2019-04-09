@@ -42,7 +42,7 @@ func headerTitle() []string {
 
 func headerTitleSubsidies() []string {
 	return []string{
-		"Kunde", "Jobnr", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Leistungsart", "FiBu", "Paginiernr.", "Honorar (DB1)", "Abgrenzung EL", "Abgrenzung FK",
+		"Kunde", "Jobnr", "Umsatz", "FK nwb", "FK wb", "Eingangsrechnungen", "Leistungsart", "FiBu", "Paginiernr.", "Abgrenzung EL", "Abgrenzung FK", "Honorar (DB1)",
 	}
 }
 
