@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/AnotherCoolDude/excel"
 )
 
@@ -20,35 +21,44 @@ type adjustedProject struct {
 	honorar                 float32
 }
 
-func (adj *adjustedProject) addRowToSheet(sheet *excel.Sheet) {
+func (adj *adjustedProject) addRowToSheet(sheet *excel.Sheet, idSuffix string) []string {
+	ids := []string{}
+
 	newRow := excel.Row{
 		1: excel.NewCell("").SetID(adj.customer),
-		2: excel.NewCell(adj.jobnr).SetID("jobnr"),
-		3: excel.NewEuroCell(adj.revenue).SetID("revenue"),
-		4: excel.NewEuroCell(adj.externalCosts).SetID("externalCosts"),
-		5: excel.NewEuroCell(adj.externalCostsChargeable).SetID("externalCostsChargeable"),
+		2: excel.NewCell(adj.jobnr),
+		3: excel.NewEuroCell(adj.revenue).SetID("revenue" + idSuffix),
+		4: excel.NewEuroCell(adj.externalCosts).SetID("externalCosts" + idSuffix),
+		5: excel.NewEuroCell(adj.externalCostsChargeable).SetID("externalCostsChargeable" + idSuffix),
 	}
+	ids = append(ids, newRow[3].ID())
+	ids = append(ids, newRow[4].ID())
+	ids = append(ids, newRow[5].ID())
 	sheet.AddRow(newRow)
 
 	for i := range adj.invoice {
 		newRow = excel.Row{
-			6: excel.NewEuroCell(adj.invoice[i]).SetID("invoice"),
+			6: excel.NewEuroCell(adj.invoice[i]).SetID("invoice" + idSuffix),
 			7: excel.NewCell(adj.activity[i]),
 			8: excel.NewCell(adj.fibu[i]),
 			9: excel.NewCell(adj.paginiernr[i]),
 		}
 		sheet.AddRow(newRow)
 	}
+	ids = append(ids, newRow[6].ID())
 
 	for i := range adj.subsidiesEL {
 		newRow = excel.Row{
-			11: excel.NewEuroCell(adj.subsidiesEL[i]).SetID("subsidiesEL"),
-			12: excel.NewEuroCell(adj.subsidiesFK[i]).SetID("subsidiesFK"),
-			13: excel.NewCell(adj.subsidiesYear[i]).SetID("subsidiesYear"),
+			11: excel.NewEuroCell(adj.subsidiesEL[i]).SetID("subsidiesEL" + idSuffix),
+			12: excel.NewEuroCell(adj.subsidiesFK[i]).SetID("subsidiesFK" + idSuffix),
+			13: excel.NewCell(adj.subsidiesYear[i]).SetID("subsidiesYear" + idSuffix),
 		}
 		sheet.AddRow(newRow)
 	}
-
+	ids = append(ids, newRow[11].ID())
+	ids = append(ids, newRow[12].ID())
+	fmt.Println(ids)
+	return ids
 }
 
 // func (adjpjt *adjustedProject) Insert(sh *excel.Sheet) {
